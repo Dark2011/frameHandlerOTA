@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/FramesHandler">
+        <file>icons/film_add.png</file>
+        <file>icons/control_play.png</file>
+        <file>icons/control_stop.png</file>
+        <file>icons/control_pause.png</file>
+        <file>icons/previous_frame.png</file>
+        <file>icons/next_frame.png</file>
+        <file>icons/film_delete.png</file>
+        <file>icons/cornerPoints.png</file>
+        <file>icons/color_adjustment.png</file>
+        <file>icons/cornerPoints_current.png</file>
+        <file>icons/cornerPoints_notSet.png</file>
+        <file>icons/cornerPoints_set.png</file>
+        <file>icons/magnifier_zoom_in.png</file>
+        <file>icons/magnifier_zoom_out.png</file>
+        <file>icons/cornerPoints_save.png</file>
+    </qresource>
+</RCC>
