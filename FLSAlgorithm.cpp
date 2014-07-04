@@ -32,7 +32,8 @@ bool FLS::compareBy_XY(const ShootPoint *point1, const ShootPoint *point2)
 
 
 FLSAlgorithm::FLSAlgorithm(QObject *parent) : QObject(parent), m_videoFileName( QString() ),
-m_frame( QImage() ), m_roiFrame( QImage() ), m_sensitivity(4), m_sizeFactor(5), m_threshold(10), m_mbt(500), 
+m_frame( QImage() ), m_roiFrame( QImage() ), 
+m_sensitivity(4), m_sizeFactor(5), m_threshold(10), m_mbt(500), m_mhbf(2.0),
 m_middleBackgdBrightness(-1), m_middleDynamicRange(-1), m_roiRect( QRect() ),
 m_prevLaserPointBrightness(0), m_skipFramesCounter(0), m_midPrevBrightness(), minShootBrightness(0),
 firstPrintServiceData(true) { ; }
@@ -86,6 +87,11 @@ void FLSAlgorithm::setNumOfFrame(int num)
 /*slot*/void FLSAlgorithm::setMBT(int mbt)
 {
 	m_mbt = mbt;
+}
+
+/*slot*/void FLSAlgorithm::setMHBF(double mhbf)
+{
+	m_mhbf = mhbf;
 }
 
 void FLSAlgorithm::checkRoiCoords(QPoint &fp, QPoint &sp)
@@ -972,22 +978,15 @@ void FLSAlgorithm_OF_Type3::calcMinShootBr()
 	substractionOfFrames();
 	int summaryBr = 0;
 
-	QVector<int>::const_iterator arrIter = tempArr.end() - 1;
-	QVector<int>::const_iterator arrEndIter = tempArr.begin() + (tempArr.size() / 2);
-	for(; arrIter != arrEndIter; --arrIter)
-		summaryBr += *arrIter;
-	if( tempArr.size() )
-		minShootBrightness = ( summaryBr / (tempArr.size() / 2) ) * 2;
-	
-	//if(m_middleDynamicRange - m_middleBackgdBrightness > 50)
-	//	minShootBrightness = 15;
-	//else if( (m_middleDynamicRange - m_middleBackgdBrightness >= 25) &&
-	//	(m_middleDynamicRange - m_middleBackgdBrightness <= 50) )
-	//	minShootBrightness = 10;
-	//else if( (m_middleDynamicRange - m_middleBackgdBrightness < 25) &&
-	//	(m_middleDynamicRange - m_middleBackgdBrightness > 10) )
-	//	minShootBrightness = 6;
-	//else minShootBrightness = 4;
+	if( !tempArr.isEmpty() )
+	{
+		QVector<int>::const_iterator arrIter = tempArr.end() - 1;
+		QVector<int>::const_iterator arrEndIter = tempArr.begin() + (tempArr.size() / 2);
+		for(; arrIter != arrEndIter; --arrIter)
+			summaryBr += *arrIter;
+		minShootBrightness = (int) ( ( summaryBr / (tempArr.size() / 2) ) * m_mhbf );
+	}
+	else minShootBrightness = 3;
 }
 
 

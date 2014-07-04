@@ -17,6 +17,7 @@ class QWidget;
 class QImage;
 class QPushButton;
 class QSpinBox;
+class QDoubleSpinBox;
 class QLabel;
 class QSlider;
 class QToolBar;
@@ -146,6 +147,8 @@ private:
 	QSpinBox *thresholdSpBox;
 	QLabel *minSumBrightnessLabel;
 	QSpinBox *minSumBrightnessSpBox;
+	QLabel *minShootBrFactorLabel;
+	QDoubleSpinBox *minShootBrFactorSpBox;
 
 	QToolBar *mainToolBar;
 	

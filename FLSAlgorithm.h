@@ -62,6 +62,7 @@ public slots:
 	void setSizeFactor(int);
 	void setThreshold(int);
 	void setMBT(int);
+	void setMHBF(double);
 	void calcFrameProperties();
 
 	virtual void stopHandle();
@@ -99,6 +100,7 @@ protected:
 	int m_sizeFactor;
 	int m_threshold;
 	int m_mbt;
+	double m_mhbf;
 
 	FLS::ShootPoints m_shootPoints;
 	FLS::Shoots m_shoots;

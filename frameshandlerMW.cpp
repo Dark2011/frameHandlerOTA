@@ -15,6 +15,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QPushButton>
 #include <QtGui/QSpinBox>
+#include <QtGui/QDoubleSpinBox>
 #include <QtGui/QLabel>
 #include <QtGui/QSlider>
 #include <QtCore/QDebug>
@@ -67,8 +68,8 @@ frameHandleAlgorithm( algCreator.create(FAC::ONE_FRAME_TYPE2) ), m_videoMode(fal
 			 this, SLOT( writeResultToLog(const HandleResult &) ) );
 
 	setCentralWidget(mainWidget);
-	setMinimumSize(1024, 768);
-	setMaximumSize(1024, 768);
+	setMinimumSize(1100, 768);
+	setMaximumSize(1100, 768);
 }
 
 void FrameHandlerMWindow::createActions()
@@ -240,7 +241,21 @@ void FrameHandlerMWindow::createFilters()
 	minSumBrightnessSpBox->setMaximum(20000);
 	minSumBrightnessSpBox->setValue(500);
 	minSumBrightnessSpBox->setEnabled(false);
-	connect(minSumBrightnessSpBox, SIGNAL( valueChanged(int) ), frameHandleAlgorithm.data(), SLOT( setMBT(int) ) );
+	connect( minSumBrightnessSpBox, SIGNAL( valueChanged(int) ),
+			 frameHandleAlgorithm.data(), SLOT( setMBT(int) ) );
+
+	minShootBrFactorLabel = new QLabel("MHBF: ");
+	minShootBrFactorLabel->setIndent(5);
+	
+	minShootBrFactorSpBox = new QDoubleSpinBox();
+	minShootBrFactorSpBox->setMinimum(0.0);
+	minShootBrFactorSpBox->setMaximum(100.0);
+	minShootBrFactorSpBox->setValue(2.0);
+	minShootBrFactorSpBox->setSingleStep(0.1);
+	minShootBrFactorSpBox->setEnabled(false);
+	connect( minShootBrFactorSpBox, SIGNAL( valueChanged(double) ),
+		     frameHandleAlgorithm.data(), SLOT( setMHBF(double) ) ); 
+	//TODO add the SIGNAL/SLOT connection
 
 	QHBoxLayout *filtersLayout = new QHBoxLayout();
 	filtersLayout->addWidget(sizeFactorLabel);
@@ -249,7 +264,9 @@ void FrameHandlerMWindow::createFilters()
 	filtersLayout->addWidget(thresholdSpBox);
 	filtersLayout->addWidget(minSumBrightnessLabel);
 	filtersLayout->addWidget(minSumBrightnessSpBox);
-	
+	filtersLayout->addWidget(minShootBrFactorLabel);
+	filtersLayout->addWidget(minShootBrFactorSpBox);
+		
 	filtersGrBox = new QGroupBox( tr("Filters") );
 	filtersGrBox->setAlignment(Qt::AlignCenter);
 	filtersGrBox->setLayout(filtersLayout);
@@ -677,6 +694,7 @@ void FrameHandlerMWindow::setFilters()
 	frameHandleAlgorithm->setThreshold( thresholdSpBox->value() );
 	frameHandleAlgorithm->setSensitivity( sensitivitySpBox->value() );
 	frameHandleAlgorithm->setMBT( minSumBrightnessSpBox->value() );
+	frameHandleAlgorithm->setMHBF( minShootBrFactorSpBox->value() );
 }
 
 void FrameHandlerMWindow::enableVideoAlgorithms(bool flag)
@@ -707,6 +725,7 @@ void FrameHandlerMWindow::reconnectAllSignals()
 	disconnect(thresholdSpBox, 0, frameHandleAlgorithm.data(), 0);
 	disconnect(framesPixmapLabel, SIGNAL( setRoi(const QList<QRect> &) ), 0, 0);
 	disconnect(minSumBrightnessSpBox, 0, frameHandleAlgorithm.data(), 0);
+	disconnect(minShootBrFactorSpBox, 0, frameHandleAlgorithm.data(), 0); 
 	disconnect(frameHandleAlgorithm.data(), SIGNAL( sendResults(const HandleResult &) ), 0, 0);
 
 	connect( frameHandleAlgorithm.data(), SIGNAL( setFrameProperties(int, int) ),
@@ -717,6 +736,8 @@ void FrameHandlerMWindow::reconnectAllSignals()
 			 frameHandleAlgorithm.data(), SLOT( setSizeFactor(int) ) );
 	connect( thresholdSpBox, SIGNAL( valueChanged(int) ),
 			 frameHandleAlgorithm.data(), SLOT( setThreshold(int) ) );
+	connect( minShootBrFactorSpBox, SIGNAL( valueChanged(double) ),
+			 frameHandleAlgorithm.data(), SLOT( setMHBF(double) ) ); 
 	connect( framesPixmapLabel, SIGNAL( setRoi(QPoint &, QPoint &) ),
 			 frameHandleAlgorithm.data(), SLOT( setRoi(QPoint &, QPoint &) ) );
 	connect( minSumBrightnessSpBox, SIGNAL( valueChanged(int) ),
@@ -731,6 +752,7 @@ void FrameHandlerMWindow::filtersEnable(bool flag)
 	sizeFactorSpBox->setEnabled(flag);
 	thresholdSpBox->setEnabled(flag);
 	minSumBrightnessSpBox->setEnabled(flag);
+	minShootBrFactorSpBox->setEnabled(flag);
 }
 
 void FrameHandlerMWindow::enableActions(bool openFlag, bool closeFlag,
@@ -783,6 +805,9 @@ void FrameHandlerMWindow::createFilter1()
 	filtersLayout->addWidget(thresholdSpBox);
 	filtersLayout->addWidget(minSumBrightnessLabel);
 	filtersLayout->addWidget(minSumBrightnessSpBox);
+	filtersLayout->addWidget(minShootBrFactorLabel);
+	filtersLayout->addWidget(minShootBrFactorSpBox);
+
 	setOriginalFrameButton->hide();
 	filtersGrBox->setLayout(filtersLayout);
 	sensitivityLabel->show();
@@ -801,6 +826,9 @@ void FrameHandlerMWindow::createFilter2()
 	filtersLayout->addWidget(thresholdSpBox);
 	filtersLayout->addWidget(minSumBrightnessLabel);
 	filtersLayout->addWidget(minSumBrightnessSpBox);
+	filtersLayout->addWidget(minShootBrFactorLabel);
+	filtersLayout->addWidget(minShootBrFactorSpBox);
+
 	sizeFactorLabel->show();
 	sizeFactorSpBox->show();
 
