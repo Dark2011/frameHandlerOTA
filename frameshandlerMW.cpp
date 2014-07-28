@@ -38,7 +38,8 @@
 
 FrameHandlerMWindow::FrameHandlerMWindow(QWidget *parent) : QMainWindow(parent), 
 m_framesHandler( new FramesHandlerKernel(this) ), m_startVideoState(false), algCreator(), 
-frameHandleAlgorithm( algCreator.create(FAC::ONE_FRAME_TYPE2) ), m_videoMode(false), m_cameraMode(false), wasSaved(false), m_startHandle(false)
+frameHandleAlgorithm( algCreator.create(FAC::ONE_FRAME_TYPE2) ), m_videoMode(false),
+m_cameraMode(false), wasSaved(false), m_startHandle(false)
 {
 	createActions();
 	createMenus();
@@ -843,7 +844,7 @@ void FrameHandlerMWindow::createFilter2()
 	enableMainButtons(true, false, false);
 
 	m_startVideoState = true;
-	m_startHandle = true; //TODO
+	if(m_videoMode)	m_startHandle = true;//need test
 	if(m_videoMode && !wasSaved)
 	{
 		frameHandleAlgorithm->setResultFileName( QFileDialog::getSaveFileName(0, "Save result of frame handle", "", "*.txt") ); //??
@@ -900,7 +901,13 @@ void FrameHandlerMWindow::createFilter2()
 	{
 		enableActions(false, false, false, false, false);
 		filtersEnable(false);
-		enableMainButtons(true, false, false);
+		//enableMainButtons(true, false, false); //old
+
+		//---new test---//
+		enableMainButtons(true, false, true);
+		startFindLSPushButton->setChecked(false);
+		m_startHandle = false;
+		//--------------//
 	}
 	else
 	{
@@ -1038,8 +1045,17 @@ void FrameHandlerMWindow::startFindLS()
 	if( startFindLSPushButton->isCheckable() )
 	{
 		frameHandleAlgorithm->setResultFileName( QFileDialog::getSaveFileName(0, "Save result of frame handle", "", "*.txt") ); //??
-		if( startFindLSPushButton->isChecked() ) m_cameraMode = true;
-		else m_cameraMode = false;
+		if( startFindLSPushButton->isChecked() )
+		{
+			//m_cameraMode = true;
+			if( !framesPixmapLabel->roiSaved() ) return;
+			m_startHandle = true;
+		}
+		else 
+		{
+			//m_cameraMode = false;
+			m_startHandle = false;
+		}
 	}
 	else
 	{
